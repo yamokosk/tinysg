@@ -1,3 +1,6 @@
+# Mercurial
+.hg/
+
 # Compiled Object files
 *.slo
 *.lo

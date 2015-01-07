@@ -1,0 +1,57 @@
+function compile_mex_interface(varargin)
+% compile_mex_interface()
+%
+%	Run compile_mex_interface() to build the mex interface to the TinySG
+%	library.
+%
+%	compile_mex_interface(true) will compile a debug version of the interface
+%	that is useful for diagnosing errors and problems with TinySG.
+
+% compile_mex_interface.m - Auto-generated from compile_mex_interface.m.in and CMake
+clear mex;
+
+% CMake will replace booleans with 'TRUE'/'FALSE'. So this is a hack to make 
+% Matlab understand CMake booleans
+TRUE = true;
+FALSE = false;
+
+debug_mode = false;
+if (nargin >= 1)
+	debug_mode = varargin{1};
+end
+	
+mexargs = ['mex_command.cpp mex_conversion.cpp tinysg.cpp ' ...
+			'-output ${MEX_TARGET_NAME} ' ...
+			'-DTIXML_USE_STL=1 ' ...
+			'-I${PROJECT_SOURCE_DIR}/src ' ...
+			'-I/usr/local/obrsp/include ' ...
+			'-L/usr/local/obrsp/lib ' ...
+			'-I${Boost_INCLUDE_DIRS} ' ...
+			'-l${PROJECT_BINARY_DIR}/src/libtinysg.dylib ' ...
+			'-lobrsp_linalg '];
+
+% Do we have Log4cxx support?
+if ( ${Log4cxx_FOUND} )
+	mexargs = [ mexargs ...
+				'-DTSG_HAVE_LOG4CXX ' ...
+				'-I${Log4cxx_INCLUDE_DIRS} ' ...
+				'-llog4cxx '];
+end
+
+% Do we have MuParser support?
+if ( ${MuParser_FOUND} )
+	mexargs = [ mexargs ...
+				' -DTSG_HAVE_MUPARSER ' ...
+				'-I${MuParser_INCLUDE_DIRS} ' ...
+				'-l${MuParser_LIBRARIES} '];
+end
+
+if ( debug_mode )
+	mexargs = [mexargs '-g -DDEBUG_TINYSG '];
+end
+	
+if ( ispc )
+	mexargs = [mexargs '-DWIN32'];
+end
+
+eval(['mex ' mexargs]);

@@ -1,0 +1,7 @@
+#find_package( Matlab )
+include( ${PROJECT_SOURCE_DIR}/cmake/FindMatlab.cmake )
+if (MATLAB_FOUND)
+	add_subdirectory( mex )
+else (MATLAB_FOUND)
+	message( STATUS "Matlab NOT found. Skipping Matlab addon.")
+endif (MATLAB_FOUND)
